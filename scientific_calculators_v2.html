@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casio Scientific Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #e6e6e6;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00dbde, #fc00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #aaa;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .calculator-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .calc-option {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+            max-width: 250px;
+        }
+
+        .calc-option:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-5px);
+        }
+
+        .calc-option.active {
+            border-color: #00dbde;
+            background: rgba(0, 219, 222, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 219, 222, 0.2);
+        }
+
+        .calc-option h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .calc-option p {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .calculator-container {
+            background: #0f1521;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .calculator-display {
+            background: #1e2a3a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .calc-expression {
+            font-size: 1.2rem;
+            color: #8a8a8a;
+            min-height: 27px;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            height: 30px;
+            overflow: hidden;
+            text-align: right;
+        }
+
+        .calc-result {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: #ffffff;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .calculator-body {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 12px;
+        }
+
+        .calc-button {
+            background: #2a3547;
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+            padding: 15px 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            user-select: none;
+        }
+
+        .calc-button:hover {
+            background: #3a4557;
+            transform: translateY(-2px);
+        }
+
+        .calc-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .calc-button.number {
+            background: #1e2a3a;
+            font-weight: 500;
+        }
+
+        .calc-button.operation {
+            background: #354155;
+            font-weight: 500;
+        }
+
+        .calc-button.function {
+            background: #4a5a72;
+            font-size: 0.9rem;
+        }
+
+        .calc-button.special {
+            background: #00adb5;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .calc-button.equals {
+            background: #ff5722;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .calc-button.double-width {
+            grid-column: span 2;
+        }
+
+        .calc-button.triple-width {
+            grid-column: span 3;
+        }
+
+        .calc-button.small-font {
+            font-size: 0.85rem;
+        }
+
+        .calc-button i {
+            font-size: 1.2rem;
+        }
+
+        .calculator-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #aaa;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .mode-indicator {
+            font-size: 0.8rem;
+            color: #8a8a8a;
+            text-align: left;
+            margin-bottom: 5px;
+            height: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-body {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 10px;
+            }
+            
+            .calc-button {
+                padding: 12px 5px;
+                font-size: 0.9rem;
+            }
+            
+            .calc-result {
+                font-size: 2rem;
+            }
+            
+            .calc-option {
+                min-width: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calculator-body {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 8px;
+            }
+            
+            .calc-button {
+                padding: 10px 3px;
+                font-size: 0.8rem;
+            }
+            
+            .calc-result {
+                font-size: 1.7rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .calc-option {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-calculator"></i> Casio Scientific Calculator</h1>
+            <p>Select a calculator model below to switch between different Casio calculator layouts and functionalities.</p>
+        </div>
+
+        <div class="calculator-selector">
+            <div class="calc-option active" data-model="100ms">
+                <h3><i class="fas fa-calculator"></i> 100MS</h3>
+                <p>Classic model with basic scientific functions</p>
+            </div>
+            <div class="calc-option" data-model="991ms">
+                <h3><i class="fas fa-calculator"></i> 991MS</h3>
+                <p>Advanced scientific calculator with matrix functions</p>
+            </div>
+            <div class="calc-option" data-model="991cw">
+                <h3><i class="fas fa-calculator"></i> FX-991CW</h3>
+                <p>Latest model with high-resolution display</p>
+            </div>
+        </div>
+
+        <!-- 100MS Calculator -->
+        <div class="calculator-container" id="calc-100ms">
+            <div class="calculator-display">
+                <div class="mode-indicator" id="mode-100ms">COMP</div>
+                <div class="calc-expression" id="expression-100ms"></div>
+                <div class="calc-result" id="result-100ms">0</div>
+            </div>
+            <div class="calculator-body" id="buttons-100ms">
+                <!-- Buttons will be generated by JavaScript -->
+            </div>
+            <div class="calculator-info">
+                Casio 100MS - Basic scientific calculator with 240 functions
+            </div>
+        </div>
+
+        <!-- 991MS Calculator -->
+        <div class="calculator-container hidden" id="calc-991ms">
+            <div class="calculator-display">
+                <div class="mode-indicator" id="mode-991ms">COMP</div>
+                <div class="calc-expression" id="expression-991ms"></div>
+                <div class="calc-result" id="result-991ms">0</div>
+            </div>
+            <div class="calculator-body" id="buttons-991ms">
+                <!-- Buttons will be generated by JavaScript -->
+            </div>
+            <div class="calculator-info">
+                Casio 991MS - Advanced scientific calculator with matrix and statistical functions
+            </div>
+        </div>
+
+        <!-- 991CW Calculator -->
+        <div class="calculator-container hidden" id="calc-991cw">
+            <div class="calculator-display">
+                <div class="mode-indicator" id="mode-991cw">COMP</div>
+                <div class="calc-expression" id="expression-991cw"></div>
+                <div class="calc-result" id="result-991cw">0</div>
+            </div>
+            <div class="calculator-body" id="buttons-991cw">
+                <!-- Buttons will be generated by JavaScript -->
+            </div>
+            <div class="calculator-info">
+                Casio FX-991CW - Modern scientific calculator with high-resolution LCD and 552 functions
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Calculator state - now with more detailed tracking like real Casio
+        const calculatorState = {
+            currentModel: "100ms",
+            currentValue: "0",
+            expression: "",
+            lastResult: "0",
+            isResultShown: false,
+            isNewCalculation: true,
+            memory: 0,
+            lastAnswer: 0,
+            waitingForOperand: false,
+            currentOperator: null,
+            previousValue: null
+        };
+
+        // Button layouts for each calculator model
+        const buttonLayouts = {
+            "100ms": [
+                // Row 1
+                { type: "function", label: "SHIFT", value: "shift", class: "special", width: 1 },
+                { type: "function", label: "ALPHA", value: "alpha", class: "special", width: 1 },
+                { type: "function", label: "√", value: "√(", class: "function", width: 1 },
+                { type: "function", label: "x²", value: "²", class: "function", width: 1 },
+                { type: "function", label: "log", value: "log(", class: "function", width: 1 },
+                { type: "function", label: "ln", value: "ln(", class: "function", width: 1 },
+                { type: "function", label: "sin", value: "sin(", class: "function", width: 1 },
+                { type: "function", label: "cos", value: "cos(", class: "function", width: 1 },
+                { type: "function", label: "tan", value: "tan(", class: "function", width: 1 },
+                { type: "special", label: "AC", value: "AC", class: "special", width: 1 },
+                
+                // Row 2
+                { type: "function", label: "x⁻¹", value: "⁻¹", class: "function", width: 1 },
+                { type: "function", label: "°′″", value: "dms", class: "function", width: 1 },
+                { type: "function", label: "x!", value: "!", class: "function", width: 1 },
+                { type: "function", label: "(", value: "(", class: "function", width: 1 },
+                { type: "function", label: ")", value: ")", class: "function", width: 1 },
+                { type: "function", label: ",", value: ",", class: "function", width: 1 },
+                { type: "number", label: "7", value: "7", class: "number", width: 1 },
+                { type: "number", label: "8", value: "8", class: "number", width: 1 },
+                { type: "number", label: "9", value: "9", class: "number", width: 1 },
+                { type: "operation", label: "÷", value: "÷", class: "operation", width: 1 },
+                
+                // Row 3
+                { type: "function", label: "ENG", value: "ENG", class: "function", width: 1 },
+                { type: "function", label: "sin⁻¹", value: "sin⁻¹(", class: "function", width: 1 },
+                { type: "function", label: "cos⁻¹", value: "cos⁻¹(", class: "function", width: 1 },
+                { type: "function", label: "tan⁻¹", value: "tan⁻¹(", class: "function", width: 1 },
+                { type: "function", label: "π", value: "π", class: "function", width: 1 },
+                { type: "function", label: "e", value: "e", class: "function", width: 1 },
+                { type: "number", label: "4", value: "4", class: "number", width: 1 },
+                { type: "number", label: "5", value: "5", class: "number", width: 1 },
+                { type: "number", label: "6", value: "6", class: "number", width: 1 },
+                { type: "operation", label: "×", value: "×", class: "operation", width: 1 },
+                
+                // Row 4
+                { type: "function", label: "(-)", value: "(-)", class: "function", width: 1 },
+                { type: "function", label: "10ˣ", value: "10^", class: "function", width: 1 },
+                { type: "function", label: "eˣ", value: "e^", class: "function", width: 1 },
+                { type: "function", label: "hyp", value: "hyp", class: "function", width: 1 },
+                { type: "function", label: "Rnd", value: "Rnd", class: "function", width: 1 },
+                { type: "function", label: "Ran#", value: "Ran#", class: "function", width: 1 },
+                { type: "number", label: "1", value: "1", class: "number", width: 1 },
+                { type: "number", label: "2", value: "2", class: "number", width: 1 },
+                { type: "number", label: "3", value: "3", class: "number", width: 1 },
+                { type: "operation", label: "−", value: "−", class: "operation", width: 1 },
+                
+                // Row 5
+                { type: "function", label: "M+", value: "M+", class: "function", width: 1 },
+                { type: "function", label: "M-", value: "M-", class: "function", width: 1 },
+                { type: "function", label: "MR", value: "MR", class: "function", width: 1 },
+                { type: "function", label: "MC", value: "MC", class: "function", width: 1 },
+                { type: "function", label: "STO", value: "STO", class: "function", width: 1 },
+                { type: "function", label: "RCL", value: "RCL", class: "function", width: 1 },
+                { type: "number", label: "0", value: "0", class: "number", width: 1 },
+                { type: "number", label: ".", value: ".", class: "number", width: 1 },
+                { type: "function", label: "EXP", value: "EXP", class: "function", width: 1 },
+                { type: "operation", label: "+", value: "+", class: "operation", width: 1 },
+                
+                // Row 6
+                { type: "function", label: "CALC", value: "CALC", class: "function", width: 1 },
+                { type: "function", label: "SD", value: "SD", class: "function", width: 1 },
+                { type: "function", label: "REG", value: "REG", class: "function", width: 1 },
+                { type: "special", label: "DEL", value: "DEL", class: "special", width: 1 },
+                { type: "special", label: "ANS", value: "ANS", class: "special", width: 1 },
+                { type: "equals", label: "=", value: "=", class: "equals", width: 2 }
+            ],
+            
+            "991ms": [
+                // Row 1
+                { type: "function", label: "MODE", value: "MODE", class: "special", width: 1 },
+                { type: "function", label: "SETUP", value: "SETUP", class: "special", width: 1 },
+                { type: "function", label: "ON", value: "ON", class: "special", width: 1 },
+                { type: "function", label: "√", value: "√(", class: "function", width: 1 },
+                { type: "function", label: "x²", value: "²", class: "function", width: 1 },
+                { type: "function", label: "x³", value: "³", class: "function", width: 1 },
+                { type: "function", label: "log", value: "log(", class: "function", width: 1 },
+                { type: "function", label: "ln", value: "ln(", class: "function", width: 1 },
+                { type: "function", label: "eˣ", value: "e^", class: "function", width: 1 },
+                { type: "special", label: "AC", value: "AC", class: "special", width: 1 },
+                
+                // Row 2
+                { type: "function", label: "sin", value: "sin(", class: "function", width: 1 },
+                { type: "function", label: "cos", value: "cos(", class: "function", width: 1 },
+                { type: "function", label: "tan", value: "tan(", class: "function", width: 1 },
+                { type: "function", label: "sin⁻¹", value: "sin⁻¹(", class: "function", width: 1 },
+                { type: "function", label: "cos⁻¹", value: "cos⁻¹(", class: "function", width: 1 },
+                { type: "function", label: "tan⁻¹", value: "tan⁻¹(", class: "function", width: 1 },
+                { type: "function", label: "(", value: "(", class: "function", width: 1 },
+                { type: "function", label: ")", value: ")", class: "function", width: 1 },
+                { type: "function", label: ",", value: ",", class: "function", width: 1 },
+                { type: "operation", label: "÷", value: "÷", class: "operation", width: 1 },
+                
+                // Row 3
+                { type: "function", label: "x⁻¹", value: "⁻¹", class: "function", width: 1 },
+                { type: "function", label: "10ˣ", value: "10^", class: "function", width: 1 },
+                { type: "function", label: "x!", value: "!", class: "function", width: 1 },
+                { type: "function", label: "π", value: "π", class: "function", width: 1 },
+                { type: "function", label: "e", value: "e", class: "function", width: 1 },
+                { type: "function", label: "∠", value: "∠", class: "function", width: 1 },
+                { type: "number", label: "7", value: "7", class: "number", width: 1 },
+                { type: "number", label: "8", value: "8", class: "number", width: 1 },
+                { type: "number", label: "9", value: "9", class: "number", width: 1 },
+                { type: "operation", label: "×", value: "×", class: "operation", width: 1 },
+                
+                // Row 4
+                { type: "function", label: "Pol", value: "Pol", class: "function", width: 1 },
+                { type: "function", label: "Rec", value: "Rec", class: "function", width: 1 },
+                { type: "function", label: "Rnd", value: "Rnd", class: "function", width: 1 },
+                { type: "function", label: "Ran#", value: "Ran#", class: "function", width: 1 },
+                { type: "function", label: "°′″", value: "dms", class: "function", width: 1 },
+                { type: "function", label: "°", value: "°", class: "function", width: 1 },
+                { type: "number", label: "4", value: "4", class: "number", width: 1 },
+                { type: "number", label: "5", value: "5", class: "number", width: 1 },
+                { type: "number", label: "6", value: "6", class: "number", width: 1 },
+                { type: "operation", label: "−", value: "−", class: "operation", width: 1 },
+                
+                // Row 5
+                { type: "function", label: "M+", value: "M+", class: "function", width: 1 },
+                { type: "function", label: "M-", value: "M-", class: "function", width: 1 },
+                { type: "function", label: "MR", value: "MR", class: "function", width: 1 },
+                { type: "function", label: "MC", value: "MC", class: "function", width: 1 },
+                { type: "function", label: "STO", value: "STO", class: "function", width: 1 },
+                { type: "function", label: "RCL", value: "RCL", class: "function", width: 1 },
+                { type: "number", label: "1", value: "1", class: "number", width: 1 },
+                { type: "number", label: "2", value: "2", class: "number", width: 1 },
+                { type: "number", label: "3", value: "3", class: "number", width: 1 },
+                { type: "operation", label: "+", value: "+", class: "operation", width: 1 },
+                
+                // Row 6
+                { type: "function", label: "CALC", value: "CALC", class: "function", width: 1 },
+                { type: "function", label: "MAT", value: "MAT", class: "function", width: 1 },
+                { type: "function", label: "VCT", value: "VCT", class: "function", width: 1 },
+                { type: "special", label: "DEL", value: "DEL", class: "special", width: 1 },
+                { type: "special", label: "ANS", value: "ANS", class: "special", width: 1 },
+                { type: "number", label: "0", value: "0", class: "number", width: 1 },
+                { type: "number", label: ".", value: ".", class: "number", width: 1 },
+                { type: "function", label: "EXP", value: "EXP", class: "function", width: 1 },
+                { type: "function", label: "(-)", value: "(-)", class: "function", width: 1 },
+                { type: "equals", label: "=", value: "=", class: "equals", width: 1 }
+            ],
+            
+            "991cw": [
+                // Row 1
+                { type: "function", label: "OPTN", value: "OPTN", class: "special", width: 1 },
+                { type: "function", label: "MENU", value: "MENU", class: "special", width: 1 },
+                { type: "function", label: "CATALOG", value: "CATALOG", class: "special small-font", width: 1 },
+                { type: "function", label: "√", value: "√(", class: "function", width: 1 },
+                { type: "function", label: "x²", value: "²", class: "function", width: 1 },
+                { type: "function", label: "log", value: "log(", class: "function", width: 1 },
+                { type: "function", label: "ln", value: "ln(", class: "function", width: 1 },
+                { type: "function", label: "sin", value: "sin(", class: "function", width: 1 },
+                { type: "function", label: "cos", value: "cos(", class: "function", width: 1 },
+                { type: "function", label: "tan", value: "tan(", class: "function", width: 1 },
+                
+                // Row 2
+                { type: "function", label: "∠", value: "∠", class: "function", width: 1 },
+                { type: "function", label: "π", value: "π", class: "function", width: 1 },
+                { type: "function", label: "e", value: "e", class: "function", width: 1 },
+                { type: "function", label: "(-)", value: "(-)", class: "function", width: 1 },
+                { type: "function", label: "x⁻¹", value: "⁻¹", class: "function", width: 1 },
+                { type: "function", label: "10ˣ", value: "10^", class: "function", width: 1 },
+                { type: "function", label: "eˣ", value: "e^", class: "function", width: 1 },
+                { type: "function", label: "Rnd", value: "Rnd", class: "function", width: 1 },
+                { type: "special", label: "AC", value: "AC", class: "special", width: 1 },
+                { type: "special", label: "DEL", value: "DEL", class: "special", width: 1 },
+                
+                // Row 3
+                { type: "function", label: "MATH", value: "MATH", class: "special", width: 1 },
+                { type: "function", label: "PROB", value: "PROB", class: "function", width: 1 },
+                { type: "function", label: "STAT", value: "STAT", class: "function", width: 1 },
+                { type: "function", label: "MAT", value: "MAT", class: "function", width: 1 },
+                { type: "function", label: "VCT", value: "VCT", class: "function", width: 1 },
+                { type: "function", label: "DIST", value: "DIST", class: "function", width: 1 },
+                { type: "number", label: "7", value: "7", class: "number", width: 1 },
+                { type: "number", label: "8", value: "8", class: "number", width: 1 },
+                { type: "number", label: "9", value: "9", class: "number", width: 1 },
+                { type: "operation", label: "÷", value: "÷", class: "operation", width: 1 },
+                
+                // Row 4
+                { type: "function", label: "CALC", value: "CALC", class: "function", width: 1 },
+                { type: "function", label: "STO", value: "STO", class: "function", width: 1 },
+                { type: "function", label: "RCL", value: "RCL", class: "function", width: 1 },
+                { type: "function", label: "ENG", value: "ENG", class: "function", width: 1 },
+                { type: "function", label: "(", value: "(", class: "function", width: 1 },
+                { type: "function", label: ")", value: ")", class: "function", width: 1 },
+                { type: "number", label: "4", value: "4", class: "number", width: 1 },
+                { type: "number", label: "5", value: "5", class: "number", width: 1 },
+                { type: "number", label: "6", value: "6", class: "number", width: 1 },
+                { type: "operation", label: "×", value: "×", class: "operation", width: 1 },
+                
+                // Row 5
+                { type: "function", label: "M+", value: "M+", class: "function", width: 1 },
+                { type: "function", label: "M-", value: "M-", class: "function", width: 1 },
+                { type: "function", label: "MR", value: "MR", class: "function", width: 1 },
+                { type: "function", label: "MC", value: "MC", class: "function", width: 1 },
+                { type: "function", label: "A", value: "A", class: "function", width: 1 },
+                { type: "function", label: "B", value: "B", class: "function", width: 1 },
+                { type: "number", label: "1", value: "1", class: "number", width: 1 },
+                { type: "number", label: "2", value: "2", class: "number", width: 1 },
+                { type: "number", label: "3", value: "3", class: "number", width: 1 },
+                { type: "operation", label: "−", value: "−", class: "operation", width: 1 },
+                
+                // Row 6
+                { type: "function", label: "C", value: "C", class: "function", width: 1 },
+                { type: "function", label: "D", value: "D", class: "function", width: 1 },
+                { type: "function", label: "E", value: "E", class: "function", width: 1 },
+                { type: "function", label: "F", value: "F", class: "function", width: 1 },
+                { type: "function", label: "x,y", value: "x,y", class: "function", width: 1 },
+                { type: "special", label: "ANS", value: "ANS", class: "special", width: 1 },
+                { type: "number", label: "0", value: "0", class: "number", width: 1 },
+                { type: "number", label: ".", value: ".", class: "number", width: 1 },
+                { type: "function", label: "EXP", value: "EXP", class: "function", width: 1 },
+                { type: "operation", label: "+", value: "+", class: "operation", width: 1 },
+                
+                // Row 7 (extra row for 991cw)
+                { type: "function", label: "X→M", value: "X→M", class: "function", width: 1 },
+                { type: "function", label: "RanInt", value: "RanInt", class: "function small-font", width: 1 },
+                { type: "function", label: "nPr", value: "nPr", class: "function", width: 1 },
+                { type: "function", label: "nCr", value: "nCr", class: "function", width: 1 },
+                { type: "function", label: "Pol", value: "Pol", class: "function", width: 1 },
+                { type: "function", label: "Rec", value: "Rec", class: "function", width: 1 },
+                { type: "function", label: ":", value: ":", class: "function", width: 1 },
+                { type: "function", label: "°′″", value: "dms", class: "function", width: 1 },
+                { type: "function", label: "'", value: "'", class: "function", width: 1 },
+                { type: "equals", label: "=", value: "=", class: "equals", width: 1 }
+            ]
+        };
+
+        // Initialize the calculator
+        function initCalculator() {
+            // Generate buttons for each calculator model
+            for (const model in buttonLayouts) {
+                const buttonContainer = document.getElementById(`buttons-${model}`);
+                buttonLayouts[model].forEach(buttonConfig => {
+                    const button = document.createElement("button");
+                    button.className = `calc-button ${buttonConfig.class}`;
+                    button.textContent = buttonConfig.label;
+                    button.dataset.type = buttonConfig.type;
+                    button.dataset.value = buttonConfig.value;
+                    
+                    // Set width based on configuration
+                    if (buttonConfig.width === 2) {
+                        button.classList.add("double-width");
+                    } else if (buttonConfig.width === 3) {
+                        button.classList.add("triple-width");
+                    }
+                    
+                    button.addEventListener("click", () => handleButtonClick(buttonConfig.value, model));
+                    buttonContainer.appendChild(button);
+                });
+            }
+            
+            // Set up calculator model selection
+            document.querySelectorAll(".calc-option").forEach(option => {
+                option.addEventListener("click", () => {
+                    const model = option.dataset.model;
+                    switchCalculatorModel(model);
+                });
+            });
+            
+            // Initialize with the first model
+            switchCalculatorModel("100ms");
+            
+            // Keyboard support
+            document.addEventListener("keydown", handleKeyboardInput);
+        }
+
+        // Switch between calculator models
+        function switchCalculatorModel(model) {
+            // Update UI
+            document.querySelectorAll(".calc-option").forEach(option => {
+                option.classList.remove("active");
+                if (option.dataset.model === model) {
+                    option.classList.add("active");
+                }
+            });
+            
+            // Hide all calculators
+            document.querySelectorAll(".calculator-container").forEach(calc => {
+                calc.classList.add("hidden");
+            });
+            
+            // Show selected calculator
+            document.getElementById(`calc-${model}`).classList.remove("hidden");
+            
+            // Update current model
+            calculatorState.currentModel = model;
+            
+            // Update display for the new model
+            updateDisplay();
+        }
+
+        // Handle button clicks
+        function handleButtonClick(value, model) {
+            if (model !== calculatorState.currentModel) return;
+            
+            // Handle different button types
+            switch(value) {
+                case "AC":
+                    clearAll();
+                    break;
+                case "DEL":
+                    deleteLast();
+                    break;
+                case "=":
+                    calculateResult();
+                    break;
+                case "ANS":
+                    inputAns();
+                    break;
+                case "M+":
+                    memoryAdd();
+                    break;
+                case "M-":
+                    memorySubtract();
+                    break;
+                case "MR":
+                    memoryRecall();
+                    break;
+                case "MC":
+                    memoryClear();
+                    break;
+                case "+":
+                case "−":
+                case "×":
+                case "÷":
+                    inputOperator(value);
+                    break;
+                case "(-)":
+                    toggleSign();
+                    break;
+                case "π":
+                    inputNumber(Math.PI.toString());
+                    break;
+                case "e":
+                    inputNumber(Math.E.toString());
+                    break;
+                case "√(":
+                    inputFunction("√(");
+                    break;
+                case "sin(":
+                    inputFunction("sin(");
+                    break;
+                case "cos(":
+                    inputFunction("cos(");
+                    break;
+                case "tan(":
+                    inputFunction("tan(");
+                    break;
+                case "sin⁻¹(":
+                    inputFunction("asin(");
+                    break;
+                case "cos⁻¹(":
+                    inputFunction("acos(");
+                    break;
+                case "tan⁻¹(":
+                    inputFunction("atan(");
+                    break;
+                case "log(":
+                    inputFunction("log10(");
+                    break;
+                case "ln(":
+                    inputFunction("ln(");
+                    break;
+                case "²":
+                    inputFunction("^2");
+                    break;
+                case "³":
+                    inputFunction("^3");
+                    break;
+                case "⁻¹":
+                    inputFunction("^(-1)");
+                    break;
+                case "!":
+                    inputFunction("!");
+                    break;
+                case "10^":
+                    inputFunction("10^");
+                    break;
+                case "e^":
+                    inputFunction("e^");
+                    break;
+                case "Rnd":
+                    inputNumber(Math.random().toFixed(5));
+                    break;
+                case "Ran#":
+                    inputNumber(Math.random().toString());
+                    break;
+                case "dms":
+                    // Convert decimal degrees to DMS
+                    if (calculatorState.isResultShown) {
+                        const deg = parseFloat(calculatorState.currentValue);
+                        const d = Math.floor(deg);
+                        const m = Math.floor((deg - d) * 60);
+                        const s = ((deg - d) * 60 - m) * 60;
+                        calculatorState.currentValue = `${d}.${m}${s.toFixed(2)}`;
+                        calculatorState.isResultShown = false;
+                        updateDisplay();
+                    }
+                    break;
+                default:
+                    // For numbers, decimal point, and parentheses
+                    if (["0","1","2","3","4","5","6","7","8","9",".","(",")",","].includes(value)) {
+                        inputNumber(value);
+                    }
+                    break;
+            }
+        }
+
+        // Handle keyboard input
+        function handleKeyboardInput(event) {
+            const key = event.key;
+            
+            // Prevent default for calculator keys
+            if ("0123456789+-*/.()".includes(key) || 
+                key === "Enter" || key === "Escape" || key === "Backspace") {
+                event.preventDefault();
+            }
+            
+            // Map keyboard keys to calculator functions
+            if (key >= "0" && key <= "9") {
+                inputNumber(key);
+            } else if (key === "+" || key === "-" || key === "*" || key === "/") {
+                const op = key === "*" ? "×" : key === "/" ? "÷" : key;
+                inputOperator(op);
+            } else if (key === ".") {
+                inputNumber(".");
+            } else if (key === "Enter" || key === "=") {
+                calculateResult();
+            } else if (key === "Escape") {
+                clearAll();
+            } else if (key === "Backspace") {
+                deleteLast();
+            } else if (key === "(") {
+                inputNumber("(");
+            } else if (key === ")") {
+                inputNumber(")");
+            }
+        }
+
+        // Input a number
+        function inputNumber(num) {
+            if (calculatorState.isResultShown) {
+                // If result is showing and user types a number, start new calculation
+                calculatorState.expression = "";
+                calculatorState.currentValue = num;
+                calculatorState.isResultShown = false;
+                calculatorState.isNewCalculation = true;
+            } else if (calculatorState.waitingForOperand) {
+                // If waiting for operand after operator, start new number
+                calculatorState.currentValue = num;
+                calculatorState.waitingForOperand = false;
+            } else {
+                // Append to current value
+                if (calculatorState.currentValue === "0" && num !== ".") {
+                    calculatorState.currentValue = num;
+                } else if (num === "." && calculatorState.currentValue.includes(".")) {
+                    // Don't add multiple decimal points
+                    return;
+                } else {
+                    calculatorState.currentValue += num;
+                }
+            }
+            updateDisplay();
+        }
+
+        // Input an operator
+        function inputOperator(op) {
+            if (calculatorState.isResultShown) {
+                // If result is showing, use it as first operand
+                calculatorState.expression = calculatorState.currentValue + op;
+                calculatorState.waitingForOperand = true;
+                calculatorState.isResultShown = false;
+                calculatorState.currentOperator = op;
+                calculatorState.previousValue = calculatorState.currentValue;
+            } else if (calculatorState.waitingForOperand) {
+                // If already waiting for operand, just change the operator
+                calculatorState.expression = calculatorState.expression.slice(0, -1) + op;
+                calculatorState.currentOperator = op;
+            } else {
+                // Start a new operation
+                if (calculatorState.expression === "") {
+                    calculatorState.expression = calculatorState.currentValue + op;
+                } else {
+                    // Calculate intermediate result
+                    calculateIntermediate();
+                    calculatorState.expression = calculatorState.currentValue + op;
+                }
+                calculatorState.waitingForOperand = true;
+                calculatorState.currentOperator = op;
+                calculatorState.previousValue = calculatorState.currentValue;
+            }
+            updateDisplay();
+        }
+
+        // Input a function
+        function inputFunction(func) {
+            if (calculatorState.isResultShown) {
+                // Apply function to the result
+                const result = applyFunction(calculatorState.currentValue, func);
+                calculatorState.currentValue = result.toString();
+                calculatorState.expression = func + calculatorState.currentValue;
+                calculatorState.isResultShown = false;
+            } else {
+                // Start function input
+                calculatorState.expression = func;
+                calculatorState.waitingForOperand = true;
+                calculatorState.isResultShown = false;
+            }
+            updateDisplay();
+        }
+
+        // Input ANS (last answer)
+        function inputAns() {
+            if (calculatorState.waitingForOperand || calculatorState.isResultShown) {
+                calculatorState.currentValue = calculatorState.lastAnswer.toString();
+                calculatorState.waitingForOperand = false;
+                calculatorState.isResultShown = false;
+                updateDisplay();
+            }
+        }
+
+        // Calculate intermediate result (for chained operations)
+        function calculateIntermediate() {
+            try {
+                if (calculatorState.previousValue && calculatorState.currentOperator) {
+                    const prev = parseFloat(calculatorState.previousValue);
+                    const current = parseFloat(calculatorState.currentValue);
+                    let result;
+                    
+                    switch(calculatorState.currentOperator) {
+                        case "+": result = prev + current; break;
+                        case "−": result = prev - current; break;
+                        case "×": result = prev * current; break;
+                        case "÷": result = prev / current; break;
+                        default: return;
+                    }
+                    
+                    calculatorState.currentValue = formatResult(result);
+                    calculatorState.lastAnswer = result;
+                }
+            } catch (error) {
+                calculatorState.currentValue = "Error";
+            }
+        }
+
+        // Calculate final result
+        function calculateResult() {
+            try {
+                if (calculatorState.currentOperator && calculatorState.previousValue) {
+                    calculateIntermediate();
+                    calculatorState.expression = calculatorState.previousValue + calculatorState.currentOperator + 
+                                                calculatorState.currentValue + "=";
+                    calculatorState.isResultShown = true;
+                    calculatorState.waitingForOperand = false;
+                    calculatorState.currentOperator = null;
+                    calculatorState.previousValue = null;
+                } else if (calculatorState.expression.includes("(") || 
+                          calculatorState.expression.includes("√") ||
+                          calculatorState.expression.includes("sin") ||
+                          calculatorState.expression.includes("cos") ||
+                          calculatorState.expression.includes("tan") ||
+                          calculatorState.expression.includes("log") ||
+                          calculatorState.expression.includes("ln") ||
+                          calculatorState.expression.includes("^")) {
+                    // Handle complex expressions with functions
+                    let expr = calculatorState.expression + calculatorState.currentValue;
+                    const result = evaluateExpression(expr);
+                    calculatorState.currentValue = formatResult(result);
+                    calculatorState.expression = expr + "=";
+                    calculatorState.lastAnswer = result;
+                    calculatorState.isResultShown = true;
+                    calculatorState.waitingForOperand = false;
+                }
+                updateDisplay();
+            } catch (error) {
+                calculatorState.currentValue = "Error";
+                calculatorState.isResultShown = true;
+                updateDisplay();
+            }
+        }
+
+        // Evaluate complex expressions
+        function evaluateExpression(expr) {
+            // Replace calculator symbols with JavaScript-compatible ones
+            expr = expr.replace(/×/g, "*").replace(/÷/g, "/");
+            expr = expr.replace(/\^2/g, "**2");
+            expr = expr.replace(/\^3/g, "**3");
+            expr = expr.replace(/\^\(-1\)/g, "**(-1)");
+            expr = expr.replace(/√\(/g, "Math.sqrt(");
+            expr = expr.replace(/sin\(/g, "Math.sin(");
+            expr = expr.replace(/cos\(/g, "Math.cos(");
+            expr = expr.replace(/tan\(/g, "Math.tan(");
+            expr = expr.replace(/asin\(/g, "Math.asin(");
+            expr = expr.replace(/acos\(/g, "Math.acos(");
+            expr = expr.replace(/atan\(/g, "Math.atan(");
+            expr = expr.replace(/log10\(/g, "Math.log10(");
+            expr = expr.replace(/ln\(/g, "Math.log(");
+            expr = expr.replace(/10\^/g, "10**");
+            expr = expr.replace(/e\^/g, "Math.E**");
+            expr = expr.replace(/π/g, "Math.PI");
+            expr = expr.replace(/e/g, "Math.E");
+            expr = expr.replace(/Rnd/g, Math.random().toFixed(5));
+            expr = expr.replace(/Ran#/g, Math.random());
+            
+            // Handle factorial
+            if (expr.includes("!")) {
+                const num = parseFloat(expr.split("!")[0]);
+                if (num >= 0 && num <= 20) {
+                    let fact = 1;
+                    for (let i = 2; i <= num; i++) fact *= i;
+                    return fact;
+                }
+            }
+            
+            // Evaluate the expression
+            return Function(`"use strict"; return (${expr})`)();
+        }
+
+        // Apply a function to a value
+        function applyFunction(value, func) {
+            const num = parseFloat(value);
+            switch(func) {
+                case "√(": return Math.sqrt(num);
+                case "sin(": return Math.sin(num);
+                case "cos(": return Math.cos(num);
+                case "tan(": return Math.tan(num);
+                case "asin(": return Math.asin(num);
+                case "acos(": return Math.acos(num);
+                case "atan(": return Math.atan(num);
+                case "log10(": return Math.log10(num);
+                case "ln(": return Math.log(num);
+                case "^2": return num * num;
+                case "^3": return num * num * num;
+                case "^(-1)": return 1 / num;
+                case "10^": return Math.pow(10, num);
+                case "e^": return Math.exp(num);
+                default: return num;
+            }
+        }
+
+        // Format result for display
+        function formatResult(result) {
+            if (typeof result !== "number") return result.toString();
+            
+            if (Number.isInteger(result)) {
+                return result.toString();
+            } else {
+                // Limit decimal places
+                const rounded = parseFloat(result.toFixed(10));
+                if (Math.abs(result) >= 1e10 || (Math.abs(result) < 1e-5 && result !== 0)) {
+                    return result.toExponential(6);
+                }
+                return rounded.toString();
+            }
+        }
+
+        // Clear all
+        function clearAll() {
+            calculatorState.currentValue = "0";
+            calculatorState.expression = "";
+            calculatorState.isResultShown = false;
+            calculatorState.waitingForOperand = false;
+            calculatorState.currentOperator = null;
+            calculatorState.previousValue = null;
+            calculatorState.isNewCalculation = true;
+            updateDisplay();
+        }
+
+        // Delete last character
+        function deleteLast() {
+            if (calculatorState.isResultShown) {
+                clearAll();
+            } else if (calculatorState.currentValue.length > 1) {
+                calculatorState.currentValue = calculatorState.currentValue.slice(0, -1);
+            } else {
+                calculatorState.currentValue = "0";
+            }
+            updateDisplay();
+        }
+
+        // Toggle sign
+        function toggleSign() {
+            if (calculatorState.currentValue.startsWith("-")) {
+                calculatorState.currentValue = calculatorState.currentValue.slice(1);
+            } else if (calculatorState.currentValue !== "0") {
+                calculatorState.currentValue = "-" + calculatorState.currentValue;
+            }
+            updateDisplay();
+        }
+
+        // Memory functions
+        function memoryAdd() {
+            const current = parseFloat(calculatorState.currentValue);
+            if (!isNaN(current)) {
+                calculatorState.memory += current;
+            }
+        }
+
+        function memorySubtract() {
+            const current = parseFloat(calculatorState.currentValue);
+            if (!isNaN(current)) {
+                calculatorState.memory -= current;
+            }
+        }
+
+        function memoryRecall() {
+            calculatorState.currentValue = calculatorState.memory.toString();
+            calculatorState.isResultShown = false;
+            updateDisplay();
+        }
+
+        function memoryClear() {
+            calculatorState.memory = 0;
+        }
+
+        // Update the calculator display
+        function updateDisplay() {
+            const expressionElement = document.getElementById(`expression-${calculatorState.currentModel}`);
+            const resultElement = document.getElementById(`result-${calculatorState.currentModel}`);
+            
+            // Update expression display
+            expressionElement.textContent = calculatorState.expression;
+            
+            // Update result display - show current value
+            resultElement.textContent = calculatorState.currentValue;
+            
+            // If result is shown, the current value is the result and should stay visible
+            // When user types a new number, it will replace the current value
+        }
+
+        // Initialize the calculator when the page loads
+        window.addEventListener("DOMContentLoaded", initCalculator);
+    </script>
+</body>
+</html>
