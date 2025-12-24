@@ -58,9 +58,6 @@ A web-based simulator of Casio scientific calculators with three different model
 - JavaScript for calculator logic and interactivity
 - Font Awesome for icons
 
-## Live Demo
-
-[Add your GitHub Pages link here after deployment]
 
 ## Installation
 
